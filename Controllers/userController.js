@@ -15,6 +15,12 @@ const register = asynchandler(async(req,res) =>{
         res.status(400)
         throw new Error("Invalid Password!")
     }
+
+    const nameexist = await User.findOne({username});
+    if(nameexist){
+        res.status(400)
+        throw new Error("This Username already exist. Please try another!")
+    }
     
     const userexist = await User.findOne({email});
     if(userexist){
@@ -75,4 +81,44 @@ const login = asynchandler(async(req,res) =>{
     }
 })
 
-module.exports = {register,login}
+const loggedIn = asynchandler(async(req,res)=>{
+    const user = await User.findById(req.user.id).select('username email')
+    res.status(200).json(user)
+})
+
+const profile = asynchandler(async(req,res) =>{
+    const user =await User.findById(req.user.id)
+    .select('username email phone role')
+
+    if(!user){
+        res.status(400);
+        throw new Error("User doesnot exist")
+    }
+
+    res.json(user);
+})
+
+const updateprofile = asynchandler(async(req,res)=>{
+    const {username,email,number } = req.body;
+    const user = await User.findById(req.user.id)
+
+    if(!user){
+        res.status(400);
+        throw new Error("User doesnot exist")
+    }
+
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.number = number || user.number;
+
+    const updateuser = await user.save()
+    
+    res.status(200).json({
+    username: updateuser.username,
+    email: updateuser.email,
+    phone: updateuser.phone, });
+
+})
+
+
+module.exports = {register,login,loggedIn,profile,updateprofile}
