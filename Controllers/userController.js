@@ -15,17 +15,13 @@ const register = asynchandler(async(req,res) =>{
         res.status(400)
         throw new Error("Invalid Password!")
     }
-
-    const nameexist = await User.findOne({username});
-    if(nameexist){
-        res.status(400)
-        throw new Error("This Username already exist. Please try another!")
-    }
     
-    const userexist = await User.findOne({email});
+    const userexist = await User.findOne({
+        $or: [{username},{email},{number}]
+    });
     if(userexist){
         res.status(400)
-        throw new Error("This EmailID already exist!")
+        throw new Error(`This user already exist!`)
     }
 
     const hashPass = await bcrypt.hash(password,10)
@@ -57,8 +53,8 @@ const login = asynchandler(async(req,res) =>{
     })
 
     if(!user){
-        res.status(400);
-        throw new Error('User already exist!!');
+        res.status(401);
+        throw new Error('User not registed');
     }
 
     if(user&&(await bcrypt.compare(password,user.password))){
