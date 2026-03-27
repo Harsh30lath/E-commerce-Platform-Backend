@@ -61,7 +61,8 @@ const login = asynchandler(async(req,res) =>{
         const accesstoken = jwt.sign({
             user:{
                 email: user.email,
-                id: user.id 
+                id: user.id,
+                role: user.role 
             }
         },
         process.env.ACCESSTOKEN,
