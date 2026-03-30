@@ -41,9 +41,13 @@ const readoneCat = asynchandler(async (req, res) => {
 const SearchCat = asynchandler(async(req,res) =>{
     let category;
     if(req.query.slug){
-    category = await Category.findOne({slug:req.query.slug})
+    category = await Category.find({
+        slug: {$regex: req.query.slug, $options:'i'}
+    })
     }else if(req.query.name){
-    category = await Category.findOne({name:req.query.name})
+    category = await Category.find({
+        name: { $regex: req.query.name, $options: "i" }
+    })
     }
 
     if(!category){
