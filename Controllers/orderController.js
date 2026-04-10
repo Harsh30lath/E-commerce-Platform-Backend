@@ -15,10 +15,8 @@ const postOrder = asynchandler(async(req,res) =>{
         res.status(404);
         throw new Error("Address not found");
     }
-
    
     const address = addressDoc._id;
-
     
     let items = [];
     if(productId){
@@ -70,7 +68,8 @@ const postOrder = asynchandler(async(req,res) =>{
     user: req.user.id,
     items,
     amount,
-    address
+    address,
+    paymentStatus: "pending"
     });
     cart.items = [];
     await cart.save();
@@ -140,4 +139,35 @@ const cancelOrder = asynchandler(async(req,res) =>{
 })
 
 
-module.exports = {postOrder,getOrder,getoneOrder,cancelOrder}
+//Admin Controller
+
+const getAllOrder = asynchandler(async(req,res) =>{
+//get All Orders include reference of the user and the other data
+
+    const order = await Order.find().populate("address");
+    if(!order) {
+        res.status(400)
+        throw new Error("Order doesnot Exist")
+    }
+
+    res.status(200).json(order)
+
+})
+
+
+const getSingleOrder = asynchandler(async(req,res) =>{
+//get single order according to their object id
+
+    const getorder = await Order.findById(req.params.id)
+    if(!getorder) {
+        res.status(400)
+        throw new Error("Order doesnot Exist")
+    }
+
+    res.status(200).json(getorder)
+
+})
+
+
+
+module.exports = {postOrder,getOrder,getoneOrder,cancelOrder,getAllOrder,getSingleOrder}

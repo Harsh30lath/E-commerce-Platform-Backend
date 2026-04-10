@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const validationToken = require('../middleware/ValidateToken');
 const role = require('../middleware/roleBased')
-const {createProduct,readProduct,readoneProduct,updateProduct,deleteProduct, SearchProduct} = require('../Controllers/productController')
+const {createProduct,readProduct,readoneProduct,updateProduct,deleteProduct} = require('../Controllers/productController')
 
 //For all Users 
 router.get('/',validationToken,readProduct)
-router.get('/search',validationToken,SearchProduct)
 router.get('/:id',validationToken,readoneProduct)
 
 

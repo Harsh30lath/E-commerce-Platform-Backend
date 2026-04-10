@@ -3,36 +3,52 @@ const Product = require('../Models/productModel');
 const asynchandler = require('express-async-handler');
 
 const readProduct = asynchandler(async(req,res) =>{
-    const read = await Product.find();
-    if(!read){
-        res.status(400);
-        throw new Error('Product doesnot exist!')
-    }
+    try {
+        const { search,sortBy , order, brand, minPrice, maxPrice} = req.query;
 
-    res.status(200).json(read);
+        let filter = {};
+        if(search){
+            filter.name= {$regex : search,$options: "i"}
+        }
 
-})
+        if(brand){
+            filter.brand ={$regex : brand ,$options: "i"}
+        }
 
-const SearchProduct = asynchandler(async(req,res) =>{
-    let product;
-    if (req.query.brand) {
-    product = await Product.find({
-        brand: { $regex: req.query.brand, $options: "i" }
-    });
-    } else if (req.query.name) {
-    product = await Product.find({
-        name: { $regex: req.query.name, $options: "i" }
-    });
-    }
+        if(minPrice || maxPrice){
+            filter.price = {};
+            if(minPrice ) filter.price.$gte = Number(minPrice)
+            if(maxPrice ) filter.price.$lte = Number(maxPrice)
+        }
 
-    if (!product || product.length === 0){
-        res.status(400);
-        throw new Error('Product cannot be find')
-    }
+        let sortOption = {};
+        const sortOrder = order === "asc" ? 1:-1;
+        if(sortBy === "price"){
+            sortOption.price = sortOrder
+        } else if (sortBy === "name"){
+            sortOption.name = sortOrder
+        } else if(sortBy === "brand"){
+            sortOption.brand = sortOrder
+        } else {
+            sortOption.createdAt = -1;
+        } 
 
-    res.status(200).json(product);
+        const read = await Product.find(filter).sort(sortOption);
+        if(!read){
+            res.status(400);
+            throw new Error('Product doesnot exist!')
+        }
     
+        res.status(200).json(read);
+    } catch (error) {
+        
+        res.status(500).json({ message: error.message });
+    
+    }
+
 })
+
+
 
 const readoneProduct = asynchandler(async(req,res) =>{
     const readOne = await Product.findById(req.params.id);
@@ -109,4 +125,4 @@ const deleteProduct = asynchandler(async(req,res) =>{
     
 })
 
-module.exports = {createProduct,readProduct,readoneProduct,updateProduct,deleteProduct, SearchProduct}
+module.exports = {createProduct,readProduct,readoneProduct,updateProduct,deleteProduct}
