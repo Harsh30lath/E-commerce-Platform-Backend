@@ -19,10 +19,18 @@ const sendAPIKey = asynchandler(async(req,res) =>{
     })
 })
 
-const paymentVerification = asynchandler(async(req,res) =>{
-    console.log(req.body)
-    
-    res.status(200).json("true")
+const webhook = asynchandler(async(req,res) =>{
+    const event = req.body.event;
+
+    if (event === "payment.captured") {
+        const payment = req.body.payload.payment.entity;
+
+        console.log(payment.id);
+        console.log(payment.order_id);
+
+    }
+
+    res.status(200).json({ status: "ok" });
 })
 
-module.exports = {processPayment,sendAPIKey,paymentVerification}
+module.exports = {processPayment,sendAPIKey,webhook}
