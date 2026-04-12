@@ -1,17 +1,20 @@
 const asynchandler = require('express-async-handler')
 const instance = require('../Config/razorpay');
 const crypto = require("crypto");
+const Order = require('../Models/orderModel');
 
 const processPayment = asynchandler(async(req,res) =>{
+    const order = await Order.findById(req.params.id);
     const options = {
         amount:Number(req.body.amount*100),
-        currency:'INR'
+        currency:'INR',
+        receipt: order._id.toString()
     }
-    const order = await instance.orders.create(options)
-    if (!order){
+    const payment = await instance.orders.create(options)
+    if (!payment){
         return res.status(500).json({ message: "Order creation failed" });
     }
-    res.status(200).json(order)
+    res.status(200).json(payment)
 })
 
 const sendAPIKey = asynchandler(async(req,res) =>{
@@ -19,6 +22,8 @@ const sendAPIKey = asynchandler(async(req,res) =>{
         key: process.env.RAZORPAY_API_KEY
     })
 })
+
+//Add WebHook here
 
 const paymentVerification = asynchandler(async(req,res) =>{
     const {razorpay_payment_id,razorpay_order_id,razorpay_signature} = req.body;
