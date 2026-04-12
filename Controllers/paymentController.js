@@ -4,15 +4,22 @@ const crypto = require("crypto");
 const Order = require('../Models/orderModel');
 
 const processPayment = asynchandler(async(req,res) =>{
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id)
+
+    if (!order) {
+        return res.status(404).json( "Order not found" )
+    }
+
     const options = {
-        amount:Number(req.body.amount*100),
+        amount:order.amount*100,
         currency:'INR',
         receipt: order._id.toString()
     }
+
     const payment = await instance.orders.create(options)
+
     if (!payment){
-        return res.status(500).json({ message: "Order creation failed" });
+        return res.status(500).json({ message: "Order creation failed" })
     }
     res.status(200).json(payment)
 })
