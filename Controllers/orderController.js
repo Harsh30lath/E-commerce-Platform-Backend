@@ -3,7 +3,7 @@ const Order = require('../Models/orderModel')
 const Address = require('../Models/addressModel')
 const Product = require('../Models/productModel')
 const Cart = require('../Models/cartModel')
-
+const sendOrderEmail = require('../Services/emailService')
 
 
 const postOrder = asynchandler(async(req,res) =>{
@@ -73,6 +73,8 @@ const postOrder = asynchandler(async(req,res) =>{
     });
     cart.items = [];
     await cart.save();
+
+    await sendOrderEmail(req.user.email, order._id);
 
   res.status(201).json(order)
 
