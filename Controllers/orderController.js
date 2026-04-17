@@ -3,7 +3,8 @@ const Order = require('../Models/orderModel')
 const Address = require('../Models/addressModel')
 const Product = require('../Models/productModel')
 const Cart = require('../Models/cartModel')
-const sendOrderEmail = require('../Services/emailService')
+const User = require('../Models/userModel')
+const {sendOrderEmail} = require('../Services/emailService')
 
 
 const postOrder = asynchandler(async(req,res) =>{
@@ -11,6 +12,8 @@ const postOrder = asynchandler(async(req,res) =>{
     const addressDoc = await Address.findOne({user: req.user.id})
     const cart = await Cart.findOne({user: req.user.id}).populate('items.product')
     const product = await Product.findById(productId);
+    const dbUser = await User.findById(req.user.id);
+
     if (!addressDoc) {
         res.status(404);
         throw new Error("Address not found");
@@ -58,6 +61,11 @@ const postOrder = asynchandler(async(req,res) =>{
         }
     }
 
+    if(items.length === 0){
+        res.status(400);
+        throw new Error("You cant order!")
+    }
+
 
     let amount = 0;
     for(let item of items){
@@ -71,12 +79,15 @@ const postOrder = asynchandler(async(req,res) =>{
     address,
     paymentStatus: "pending"
     });
+
+    if (cart) {
     cart.items = [];
     await cart.save();
+    }
 
-    await sendOrderEmail(req.user.email, order._id);
+    sendOrderEmail(dbUser.email, order._id);
 
-  res.status(201).json(order)
+    res.status(201).json(order)
 
 
 })

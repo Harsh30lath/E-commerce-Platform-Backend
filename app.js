@@ -24,6 +24,6 @@ app.use('/api/payment',paymentRoutes)
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () =>{
+app.listen(PORT,"0.0.0.0", () =>{
     console.log('Server is Serving at Port 5000')
 }) 
