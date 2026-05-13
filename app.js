@@ -1,0 +1,43 @@
+const express = require('express');
+const app = express();
+require('dotenv').config();
+const userRoutes = require('./Routes/userRoutes')
+const addressRoutes = require('./Routes/addressRoutes')
+const categoryRoutes =require('./Routes/categoryRoutes')
+const productRoutes = require('./Routes/productRoutes')
+const cartRoutes = require('./Routes/cartRoutes')
+const orderRoutes = require('./Routes/orderRoutes')
+const paymentRoutes = require('./Routes/paymentRoutes');
+const uploadRoutes = require('./Routes/uploadRoutes')
+const connectDB = require('./Config/DBconnect')
+
+connectDB();
+
+app.use(
+  "/api/payment/webhook",
+  express.raw({ type: "*/*" })
+);
+
+
+app.use(express.json())
+
+app.use('/api/upload',uploadRoutes)
+app.use('/api/user',userRoutes)
+app.use('/api/user',addressRoutes)
+app.use('/api/category',categoryRoutes)
+app.use('/api/product',productRoutes)
+app.use('/api/cart',cartRoutes)
+app.use('/api/order',orderRoutes)
+app.use('/api/payment',paymentRoutes)
+
+
+app.get ('/', (req,res) =>{
+    res.status(200).send("Hiii backend is running");
+})
+
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT,"0.0.0.0", () =>{
+    console.log('Server is Serving at Port 5000')
+}) 
