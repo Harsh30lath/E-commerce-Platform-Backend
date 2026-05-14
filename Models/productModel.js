@@ -41,7 +41,20 @@ const productModel = new mongoose.Schema({
         type: String,
         enum: ["men", "women", "unisex", "kids"],
         required: true
-    }
+    },
+
+       image: [
+        {
+            url: {
+                type: String,
+                required: true
+            },
+            key: {
+                type: String,  // S3 file key for deletion
+                required: true
+            }
+        }
+    ],
 }
 ,{
     timestamps: true

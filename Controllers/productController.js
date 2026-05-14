@@ -71,9 +71,9 @@ const readoneProduct = asynchandler(async(req,res) =>{
 })
 
 const createProduct = asynchandler(async(req,res) =>{
-    const { name , price ,description, category, brand, stock, gender, size} = req.body;
+    const { name , price ,description, category, brand, stock, gender, size,image} = req.body;
 
-    if(!name||!price|| !description ||!category||!brand||!stock|| !gender||!size){
+    if(!name||!price|| !description ||!category||!brand||!stock|| !gender||!size|| !image){
         res.status(400);
         throw new Error('Please fill all details of the product');
     }
@@ -86,6 +86,16 @@ const createProduct = asynchandler(async(req,res) =>{
         throw new Error("Category not found");
     }
 
+    if(!req.files || req.files.length === 0){
+        res.status(404);
+        throw new Error("Please upload images of the Product");
+    }
+
+    const imageurls = req.files.map(file=>({
+        url:file.location,
+        key:file.key
+    }))
+    
     const create = await Product.create({
         name,
         price,
@@ -94,7 +104,8 @@ const createProduct = asynchandler(async(req,res) =>{
         brand,
         gender,
         stock,
-        size
+        size,
+        image: imageurls
     });
     
     res.status(201).json(create)
