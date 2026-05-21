@@ -9,19 +9,31 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
-          username:  ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_HOST }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd E-commerce-Platform-Backend
+
             git pull origin main
+
             npm install
+
             pm2 restart app || pm2 start app.js --name app
+
             pm2 save
