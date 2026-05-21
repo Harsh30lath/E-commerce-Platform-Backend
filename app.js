@@ -32,7 +32,7 @@ app.use('/api/payment',paymentRoutes)
 
 
 app.get ('/', (req,res) =>{
-    res.status(200).send("Hiii backend is running");
+    res.status(200).send("Your Backend is running");
 })
 
 
