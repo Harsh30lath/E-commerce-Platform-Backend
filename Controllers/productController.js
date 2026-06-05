@@ -73,7 +73,7 @@ const readoneProduct = asynchandler(async(req,res) =>{
 const createProduct = asynchandler(async(req,res) =>{
     const { name , price ,description, category, brand, stock, gender, size,image} = req.body;
 
-    if(!name||!price|| !description ||!category||!brand||!stock|| !gender||!size|| !image){
+    if(!name||!price|| !description ||!category||!brand||!stock|| !gender||!size){
         res.status(400);
         throw new Error('Please fill all details of the product');
     }
